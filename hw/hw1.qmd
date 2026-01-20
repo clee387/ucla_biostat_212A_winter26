@@ -74,6 +74,36 @@ part (a).
 
 ## ISL Exercise 2.4.4 (10% pts)
 
+a\) Three real-life applications where ***classification*** is useful:
+(Describe the response, as well as the predictors. Is the goal of each
+application inference or prediction? Explain your answer)
+
+1.   The relationship between being diagnosed with heart disease (yes/no
+    outcome) based on their thallium response (predictor 1) and
+    cholesterol level (predictor 2).
+2.   Whether or not someone survived/died (binary outcome) based on if
+    they had lung cancer (predictor 1) and age (predictor 2).
+3.  The relationship between whether or not someone bought a car (binary
+    outcome) based on their annual income amount (predictor 1) and
+    respective work location (predictor 2).
+
+b\) Three real-life applications where ***regression*** is useful:
+(Describe the response, as well as the predictors. Is the goal of each
+application inference or prediction? Explain your answer)
+
+1.   The relationship between change in height (outcome) based on sleep
+    amount (predictor 1) and age (predictor 2).
+2.   Measuring the exponential growth rate of a population of wolves.
+3.   The relationship between amount of college drop-outs (outcome)
+    based on number of resource organizations/programs available
+    (predictor 2) and college name (predictor 2).
+
+c\) Three real-life applications where ***cluster analysis*** is useful:
+
+1.  Gene expression?
+2.  
+3.  
+
 ## ISL Exercise 2.4.10 (30% pts)
 
 Your can read in the `boston` data set directly from url
