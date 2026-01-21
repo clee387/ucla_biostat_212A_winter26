@@ -80,19 +80,25 @@ application inference or prediction? Explain your answer)
 
 1.   The relationship between being diagnosed with heart disease (yes/no
     outcome) based on their thallium response (predictor 1) and
-    cholesterol level (predictor 2).
+    cholesterol level (predictor 2). The goal is prediction because we
+    are trying to predict whether a patient will be diagnosed with heart
+    disease (yes/no) which is a binary categorical outcome.
 2.   Whether or not someone survived/died (binary outcome) based on if
-    they had lung cancer (predictor 1) and age (predictor 2).
+    they had lung cancer (predictor 1) and age (predictor 2). The goal
+    is prediction because we are trying to predict whether an individual
+    will survive/die which is a binary categorical outcome.
 3.  The relationship between whether or not someone bought a car (binary
     outcome) based on their annual income amount (predictor 1) and
-    respective work location (predictor 2).
+    respective work location (predictor 2). The goal is prediction
+    because we are trying to predict whether or not someone buys/does
+    not buy which is a binary categorical outcome.
 
 b\) Three real-life applications where ***regression*** is useful:
 (Describe the response, as well as the predictors. Is the goal of each
 application inference or prediction? Explain your answer)
 
-1.   The relationship between change in height (outcome) based on sleep
-    amount (predictor 1) and age (predictor 2).
+1.   The relationship between change in height in milimeters (outcome)
+    based on sleep amount (predictor 1) and age (predictor 2).
 2.   Measuring the exponential growth rate of a population of wolves.
 3.   The relationship between amount of college drop-outs (outcome)
     based on number of resource organizations/programs available
@@ -100,9 +106,10 @@ application inference or prediction? Explain your answer)
 
 c\) Three real-life applications where ***cluster analysis*** is useful:
 
-1.  Gene expression?
-2.  
-3.  
+1.  To group properties by price, location or size.
+2.  To group students together by region they are from for admission
+    bias analysis
+3.  To group patients together for clinical trials
 
 ## ISL Exercise 2.4.10 (30% pts)
 
