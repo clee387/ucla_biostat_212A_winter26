@@ -78,12 +78,12 @@ a\) Three real-life applications where ***classification*** is useful:
 (Describe the response, as well as the predictors. Is the goal of each
 application inference or prediction? Explain your answer)
 
-1.   The relationship between being diagnosed with heart disease (yes/no
+1.  The relationship between being diagnosed with heart disease (yes/no
     outcome) based on their thallium response (predictor 1) and
     cholesterol level (predictor 2). The goal is prediction because we
     are trying to predict whether a patient will be diagnosed with heart
     disease (yes/no) which is a binary categorical outcome.
-2.   Whether or not someone survived/died (binary outcome) based on if
+2.  Whether or not someone survived/died (binary outcome) based on if
     they had lung cancer (predictor 1) and age (predictor 2). The goal
     is prediction because we are trying to predict whether an individual
     will survive/die which is a binary categorical outcome.
@@ -97,19 +97,20 @@ b\) Three real-life applications where ***regression*** is useful:
 (Describe the response, as well as the predictors. Is the goal of each
 application inference or prediction? Explain your answer)
 
-1.   The relationship between change in height in milimeters (outcome)
+1.  The relationship between change in height in milimeters (outcome)
     based on sleep amount (predictor 1) and age (predictor 2).
-2.   Measuring the exponential growth rate of a population of wolves.
-3.   The relationship between amount of college drop-outs (outcome)
-    based on number of resource organizations/programs available
-    (predictor 2) and college name (predictor 2).
+2.  Measuring the exponential growth rate of a population of wolves.
+3.  The relationship between amount of college drop-outs (outcome) based
+    on number of resource organizations/programs available (predictor 2)
+    and college name (predictor 2).
 
 c\) Three real-life applications where ***cluster analysis*** is useful:
 
-1.  To group properties by price, location or size.
+1.  To group properties by price, location or size for real estate
+    agents to understand trends
 2.  To group students together by region they are from for admission
-    bias analysis
-3.  To group patients together for clinical trials
+    bias analysis.
+3.  To group patients together for clinical trials research.
 
 ## ISL Exercise 2.4.10 (30% pts)
 
@@ -209,13 +210,17 @@ pairwise_scatterplots
 
 ```
 
-c\) Are any of the predictors associated with per capita crime rate?
+c\) Are any of the predictors associated with per capita crime rate? If
+so, explain the relationship.
 
-If so, explain the relationship.
-
-```{r}
-
-```
+-   Yes, all the other predictors: zn, indus, nox, rm, age, dis, rad,
+    tax, ptratio, lstat, and medv are associate with crim (per capita
+    crime rate by town. The relationship between zn, rm, dis, and medv
+    are all negatively associated with crim based on negative
+    correlation coefficients values of -0.200, -0.219, -0.380, and
+    -0.388. The other variables: indus, nox, age, rad, tax, ptratio, and
+    lstat, with a positive association with crim have correlation
+    coefficients of 0.407, 0.421, 0.353, 0.626, 0.583, 0.290 and 0.456.
 
 d\) Do any of the census tracts of Boston appear to have particularly
 high crime rates? Tax rates ? Pupil-teacher ratios? Comment on the range
