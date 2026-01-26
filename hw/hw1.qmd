@@ -40,6 +40,8 @@ $$ minimizes the mean squared prediction error $$
 $$ where the expectations averages over variations in both $X$ and $Y$.
 (Hint: condition on $X$.)
 
+![](../images/IMG_5191.png)
+
 ### Bias-variance trade-off
 
 Given an estimate $\hat f$ of $f$, show that the test error at a $x_0$
@@ -47,6 +49,8 @@ can be decomposed as $$
 \operatorname{E}\{[y_0 - \hat f(x_0)]^2\} = \underbrace{\operatorname{Var}(\hat f(x_0)) + [\operatorname{Bias}(\hat f(x_0))]^2}_{\text{MSE of } \hat f(x_0) \text{ for estimating } f(x_0)} + \underbrace{\operatorname{Var}(\epsilon)}_{\text{irreducible}},
 $$ where the expectation averages over the variability in $y_0$ and
 $\hat f$.
+
+![](../images/IMG_5192.png) ![](../images/IMG_5193.png)
 
 ## ISL Exercise 2.4.3 (10% pts)
 
@@ -59,14 +63,61 @@ for each curve. There should be five curves.
 
 Make sure to label each one.
 
-```{r, eval = F}
+```{r, eval = T}
 library(tidyverse)
 library(readr)
+
 advertising <- read.csv("/Users/charlottelee/Documents/BIOSTAT_212A_DS_in_R/ucla_biostat_212A/data/Advertising.csv")
 head(advertising)
 
 fit <- lm(sales ~ TV, data = advertising)
 summary(fit)
+
+set.seed(100)
+train_idx <- sample(1:nrow(advertising), size = 0.7*nrow(advertising))
+train <- advertising[train_idx, ]
+test <- advertising[-train_idx, ]
+
+# Vectors to store errors
+max_degree <- 10
+training_error <- numeric(10)
+test_error <- numeric(10)
+
+# Fit polynomial models of degree 1 to 10 for flexibility of the model
+for (d in 1:10) {
+  fit <- lm(sales ~ poly(TV, d), data = train)
+  
+# Training error (MSE)
+  pred_train <- predict(fit, newdata = train)
+  training_error[d] <- mean((train$sales - pred_train)^2)
+  
+  # Test error (MSE)
+  pred_test <- predict(fit, newdata = test)
+  test_error[d] <- mean((test$sales - pred_test)^2)}
+
+
+flex <- 1:max_degree
+bias2 <- 10 / flex            
+variance <- flex                
+bayes <- rep(2, max_degree)   
+
+#Plot all five curves
+plot(flex, bias2, type="n", xlab="Flexibility (Polynomial Degree)", 
+     ylab="Error", ylim=c(0, max(c(test_error, bias2, variance, bayes, training_error))),
+     main="Bias-Variance Tradeoff (All Five Curves)")
+
+# Adding curves
+lines(flex, bias2, col="red", lwd=2)
+lines(flex, variance, col="orange", lwd=2)
+lines(flex, training_error, col="gold", lwd=2, type="o", pch=16)
+lines(flex, test_error, col="green", lwd=2, type="o", pch=16)
+lines(flex, bayes, col="blue", lwd=2, lty=2)
+
+# Add legend
+legend("topright", legend=c("Bias^2","Variance","Training Error","Test Error","Bayes Error"),
+       col=c("red","orange","gold","green","blue"), lwd=2, lty=c(1,1,1,1,2), pch=c(NA,NA,16,16,NA))
+
+
 ```
 
 \(b\) Explain why each of the five curves has the shape displayed in
@@ -161,6 +212,7 @@ a\) Loading the data.
 
 ```{r, evalue = F}
 library(tidyverse)
+library(readr)
 
 Boston <- read_csv("https://raw.githubusercontent.com/ucla-biostat-212a/2026winter/master/slides/data/Boston.csv", col_select = -1) %>% 
   print(width = Inf)
@@ -224,56 +276,405 @@ so, explain the relationship.
 
 d\) Do any of the census tracts of Boston appear to have particularly
 high crime rates? Tax rates ? Pupil-teacher ratios? Comment on the range
-of each predictor
+of each predictor.
+
+-   Based on a function looking at the upper 95th percentile for each
+    variable column (except the dummy variable chas):
+    -   crim:
+        -   highest value: 89.0
+        -   rows: 1
+        -   comment: There is one census tract with a very high crime
+            rate compared to the rest of the city. The range is from
+            0.00632 to 88.97620.
+    -   tax:
+        -   highest value: 711.0
+        -   rows tied at max value: 5
+        -   comment: There are 5 census tracts with the highest tax
+            value. The range is from 187 to 711.
+    -   ptratio:
+        -   highest value: 22.00
+        -   rows tied at max value: 2
+        -   comment: There are 2 census tracts with the highest student
+            teacher ratio. The range is from 12.6 to 22.0
 
 ```{r}
+#counts_boxplot<-ggplot(Boston) +  boxplot()
+
+#look at means, maxs, mins, median
+summary(Boston)
+
+summary(Boston$crim)
+summary(Boston$tax)
+summary(Boston$ptratio)
+
+range(Boston$crim)
+range(Boston$tax)
+range(Boston$ptratio)
+diff(range(Boston$crim))
+diff(range(Boston$tax))
+diff(range(Boston$ptratio))
+
+#Find the outliers/highest rates 
+  #the first x here is just the placeholder
+higher_rates<-function(data, x) {
+  data %>%
+   filter({{x}} >=(quantile({{x}}, 0.95))) %>%
+    arrange(desc({{x}}))
+}
+
+highest_row <- function(data, x) {
+  data %>%
+    filter({{ x }} == max({{ x }}, na.rm = TRUE))
+}
+
+#the double brackets say "Look for this column inside the data frame.”
+highest_row(Boston, crim)
+highest_row(Boston, tax)
+highest_row(Boston, ptratio)
+
+#other predictors:
+highest_row(Boston, zn)
+highest_row(Boston, indus)
+highest_row(Boston, nox)
+highest_row(Boston, rm)
+highest_row(Boston, age)
+highest_row(Boston, dis)
+highest_row(Boston, rad)
+
+
+highest_row(Boston, lstat)
+highest_row(Boston, medv)
+
+
+#this is a count/dummy variable
+#higher_rates(Boston, chas)
 
 ```
 
 e\) How many of the census tracts in this data set bound the Charles
 river?
 
-```{r}
+-   35 census tracts bound the Charles River
 
+```{r}
+Boston %>%
+  select(chas) %>%
+  filter(chas==1) %>%
+  nrow()
+  
 ```
 
 f\) What is the median pupil-teacher ratio among the towns in this data
 set?
 
+-   The median pupil-teacher ratio among the towns is 19.05.
+
 ```{r}
 
+median<-median(Boston$ptratio)
+median
 ```
 
 g\) Which census tract of Boston has lowest median value of
-owneroccupied homes? What are the values of the other predictors for
+owner-occupied homes? What are the values of the other predictors for
 that census tract, and how do those values compare to the overall ranges
 for those predictors? Comment on your findings.
 
-```{r}
+-   Below are the two census tracts with the lowest median value of
+    owner-occupied homes with the values of the other predictors shown
+    as well.
 
+-   These tracts have the lowest home values and tend to have high crime
+    rates, very old housing, high pollution, large class sizes, and a
+    higher proportion of lower-status residents.
+
+-   A lot of the predictor values are near the extremes, showing that
+    these areas potenitally seem to face multiple social, economic, and
+    environmental challenges.
+
+```{r}
+lowest_row <- Boston[Boston$medv == min(Boston$medv), ]
+lowest_row
+
+predictor_ranges <- sapply(Boston[, c("crim", "zn", "indus", "chas", "nox", "rm",
+                                      "age", "dis", "rad", "tax", "ptratio", "lstat")], range)
+predictor_ranges
 ```
 
 h\) In this data set, how many of the census tracts average more than
-seven rooms per dwelling?More than eight rooms per dwelling? Comment on
+seven rooms per dwelling? More than eight rooms per dwelling? Comment on
 the census tracts that average more than eight rooms per dwelling
 
-```{r}
+-   There are 64 census tracts that average more than 7 rooms/dwelling.
 
+-   There are 13 census tracts that average more than 8 rooms/dwelling.
+
+    -   The census tracts with more than eight rooms per dwelling have
+        low crime rates, high median home values, and very few
+        lower-status residents. Pollution is low, class sizes are
+        moderate, and the homes tend to be newer. Across most
+        predictors, these tracts are near the higher or lower extremes
+        in the direction associated with better living conditions.
+
+```{r}
+#more than 7 rooms/dwelling
+Boston %>%
+  filter(rm>7) %>% 
+  nrow()
+
+#more than 8 rooms/dwelling
+Boston %>%
+  filter(rm>8) %>% 
+  nrow()  
 ```
 
 ## ISL Exercise 3.7.3 (20% pts)
 
+Suppose we have a data set with five predictors, X1 = GPA, X2 =IQ, X3 =
+Level (1 for College and 0 for High School), X4 = Interaction between
+GPA and IQ, and X5 = Interaction between GPA and Level. The response is
+starting salary after graduation (in thousands of dollars). Suppose we
+use least squares to fit the model, and get:
+
+βˆ0 = 50,
+
+βˆ1 = 20,
+
+βˆ2 = 0.07,
+
+βˆ3 = 35,
+
+βˆ4 = 0.01,
+
+βˆ5 = −10.
+
+(a). Which answer is correct, and why?
+
+-   i\. For a fixed value of IQ and GPA, high school graduates earn
+    more, on average, than college graduates.
+
+3 Continued. Linear Regression
+
+-   ii\. For a fixed value of IQ and GPA, college graduates earn more,
+    on average, than high school graduates.
+
+-   iii\. For a fixed value of IQ and GPA, high school graduates earn
+    more, on average, than college graduates provided that the GPA is
+    high enough.
+
+-   iv\. For a fixed value of IQ and GPA, college graduates earn more,
+    on average, than high school graduates provided that the GPA is high
+    enough.
+
+This confirms that statement iii is correct: **high school graduates
+earn more than college graduates provided that the GPA is high enough**.
+Statements i, ii, and iv are not always holding true across all GPA
+values. The R function automates this calculation and clearly shows the
+threshold GPA (3.5) at which the predicted salary advantage switches
+from College to High School.
+
+\(b\) Predict the salary of a college graduate with IQ of 110 and a GPA
+of 4.0.
+
+-   137.1 or \$137.1k
+
+\(c\) True or false: Since the coefficient for the GPA/IQ interaction
+term is very small, there is very little evidence of an interaction
+effect. Justify your answer.
+
+-   The GPA × IQ coefficient is small, but because GPA × IQ can be
+    large, the interaction still affects predicted salaries, so there is
+    evidence of an interaction effect.
+
+-   The predicted salary for a College graduate with GPA = 4 and IQ =
+    110 is 137.1k. The GPA × IQ interaction term contributes 4.4k to
+    this prediction. Even though the coefficient (0.01) is small, the
+    interaction still has a noticeable effect on the predicted salary,
+    so there is evidence of an interaction.
+
 ```{r}
+#b
+B0 <- 50; B1 <- 20; B2 <- 0.07; B3 <- 35; B4 <- 0.01; B5 <- -10
+Level <- 1 
+GPA <- 4.0
+IQ <- 110
+
+pred <- B0 + B1*GPA + B2*IQ + B3*Level + B4*(GPA*IQ) + B5*(GPA*Level)
+pred
+
+#c)
+interaction_effect <- B4 * (GPA * IQ)
+interaction_effect
+
+#a)
+#write function
+check_salaries <- function(GPA, IQ = 110) {
+  Difference <- 35 - 10*GPA
+  
+  if (Difference > 0) {
+    return("Statement ii: College earns more than High School")
+  } else if (Difference < 0) {
+    if (GPA > 3.5) {
+      return("Statement iii: High School earns more than College provided GPA is high enough")
+    } else {
+      return("Statement i: High School earns more than College (not high GPA)")  # technically never happens for this model
+    }
+  } else {
+    return("College and High School earn the same")
+  }
+}
+# Examples
+   # College > High School
+check_salaries(3.2) 
+  # High School > College
+check_salaries(3.8)  
+   # Exactly equal`
+check_salaries(3.5) 
 
 ```
 
 ## ISL Exercise 3.7.15 (20% pts)
 
+This problem involves the Boston data set, which we saw in the lab for
+this chapter. We will now try to predict per capita crime rate using the
+other variables in this data set. In other words, per capita crime rate
+is the response, and the other variables are the predictors.
+
+\(a\) For each predictor, fit a simple linear regression model to
+predict the response. Describe your results. In which of the models is
+there a statistically significant association between the predictor and
+the response? Create some plots to back up your assertions.
+
+-   All predictors show statistically significant associations with
+    crime rate (p-values \< 0.01), indicating that each variable is
+    meaningfully related to the crime rate response variable.
+
 ```{r}
+library(ggplot2)
+predictors <- names(Boston)[names(Boston) != "crim"] 
+
+#make function so i don't have to do this manually:
+for (var in predictors) {
+  
+  # linear regression
+  fit <- lm(Boston$crim ~ Boston[[var]])  
+  cat("\nPredictor:", var, "\n")
+  
+  # print intercept, slope, t/p-value
+  print(summary(fit)$coefficients)        
+}
+
+#Graphs:
+#write a function to do this multiple times
+for (var in predictors) {
+  ggplot(Boston, aes(x = .data[[var]], y = crim)) + 
+    geom_point(color = "steelblue") + 
+    geom_smooth(method = "lm", color = "red") +
+    labs(x = var, y = "Crime Rate", title = paste("Crime vs", var)) + theme_minimal() -> p
+    print(p)
+}
 
 ```
 
+\(b\) Fit a multiple regression model to predict the response using all
+of the predictors. Describe your results. For which predictors can we
+reject the null hypothesis H0 : βj = 0?
+
+-   This multiple regressions model has zn, dis, rad, and medv as
+    significant predictors while all others are not significant at the
+    0.01 level (minimum). These are the predictors we can reject the
+    null hypothesis for.
+
+```{r}
+multi_reg<-lm(crim ~., data = Boston)
+summary(multi_reg)
+```
+
+\(c\) How do your results from (a) compare to your results from (b)?
+Create a plot displaying the uni-variate regression coefficients from
+(a) on the x-axis, and the multiple regression coefficients from (b) on
+the y-axis. That is, each predictor is displayed as a single point in
+the plot. Its coefficient in a simple linear regression model is shown
+on the x-axis, and its coefficient estimate in the multiple linear
+regression model is shown on the y-axis.
+
+-   My results from (a) to (b) are very different as more predictors are
+    significant on their own when run on crime rate verses when they are
+    combined int eh multiple regressions model.
+
+```{r}
+# getting reg 1 coeffs
+simple_coefs <- numeric(length(predictors))
+
+#loop through each predictor
+for (i in 1:length(predictors)) {
+  fit <- lm(Boston$crim ~ Boston[[predictors[i]]])
+  simple_coefs[i] <- coef(fit)[2]  # get slope
+}
+
+# get reg 2 coeffs
+multi_coefs <- coef(multi_reg)[-1]  # subtract to drop the intercept we don't need
+
+# Plot comparison
+plot(simple_coefs, multi_coefs,
+     xlab = "Simple Regression Coefficient",
+     ylab = "Multiple Regression Coefficient",
+     main = "Simple vs Multiple Regression Coefficients", pch = 19, col = "blue", 
+     xlim = c(min(simple_coefs[simple_coefs < 5]), max(simple_coefs))) 
+abline(h = 0, v = 0, col = "gray", lty = 2) 
+text(simple_coefs, multi_coefs, labels = predictors, pos = 4, cex = 0.8, offset=0.5)
+
+```
+
+\(d\) Is there evidence of non-linear association between any of the
+predictors and the response? To answer this question, for each predictor
+X, fit a model of the form Y = β0 + β1X + β2X2 + β3X3 + E.
+
+-   Note: chas not included here because it is binary (wouldn't add
+    anything helpful)
+
+-   Yes, there is evidence of a non-linear associations between multiple
+    predictors and the response:
+
+    -   Quadratic Model (p values \<0.01): zn, indus, nox, dis, ptratio,
+        and medv all had significant p-values
+
+    -   Cubic Model (p-values \<0.05): indus, nox, age, dis, ptratio,
+        and medv all had significant p-values
+
+```{r}
+predictors <- c("zn", "indus", "nox", "rm", "age", "dis", "rad", "tax", "ptratio", "lstat", "medv")
+#significance level indicator function bc it's not built in here
+get_sig <- function(p) {
+  if (p < 0.001) return("***")
+  else if (p < 0.01) return("**")
+  else if (p < 0.05) return("*")
+  else if (p < 0.1) return(".")
+  else return("")
+}
+#function:
+fit_cubic <- function(data, response, predictor) {
+  model <- lm(as.formula(paste(response, "~", predictor, "+ I(", predictor, "^2) + I(", predictor, "^3)")), data = data)
+  s <- summary(model)
+  
+  p_quad <- s$coefficients[2, 4]
+  p_cubic <- s$coefficients[3, 4]
+  
+  sig_quad <- get_sig(p_quad)
+  sig_cubic <- get_sig(p_cubic)
+  
+  c(p_quad = p_quad, sig_quad = sig_quad, p_cubic = p_cubic, sig_cubic = sig_cubic)
+}
+
+results <- sapply(predictors, function(x) fit_cubic(Boston, "crim", x))
+#transpose to have predictors as rows
+results <- t(results)  
+results <- as.data.frame(results)
+results
+```
+
 ## Bonus question (Extra credits)
+![](../images/IMG_5195.png)
 
 For multiple linear regression, show that $R^2$ is equal to the
 correlation between the response vector
